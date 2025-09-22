@@ -1,0 +1,17 @@
+{
+  "$id": "/schemas/requests/CreateReportGenerationRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "dealNb": {
+      "type": "number"
+    },
+    "conventions": {
+      "$ref": "/schemas/types/ConventionType"
+    },
+    "options": {
+      "$ref": "/schemas/types/GenerationOptions"
+    }
+  },
+  "required": ["dealNb", "conventions"]
+}

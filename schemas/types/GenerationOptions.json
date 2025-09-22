@@ -1,0 +1,20 @@
+{
+  "$id": "/schemas/types/GenerationOptions",
+  "additionalProperties": false,
+  "type": "object",
+  "properties": {
+    "suitTolerance": {
+      "type": "number",
+      "minimum": 0
+    },
+    "hcpTolerance": {
+      "type": "number",
+      "minimum": 0
+    },
+    "bidIndex": {
+      "type": "number",
+      "minimum": 0
+    }
+  },
+  "required": []
+}

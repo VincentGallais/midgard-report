@@ -1,5 +1,39 @@
-DROP DATABASE IF EXISTS "midgard-deal-report";
+DROP DATABASE IF EXISTS "midgard-report";
 
-CREATE DATABASE "midgard-deal-report";
+CREATE DATABASE "midgard-report";
 
-\c "midgard-deal-report"
+\c "midgard-report"
+
+CREATE TYPE report_generation_status AS ENUM ('PENDING', 'RUNNING', 'COMPLETED', 'ERROR');
+
+CREATE TABLE bidinfo_report (
+    id SERIAL PRIMARY KEY,
+    dealer VARCHAR(1) NOT NULL,
+    vulnerability VARCHAR(1) NOT NULL,
+    distribution VARCHAR(52) NOT NULL,
+    bids VARCHAR NOT NULL,
+    conventions_bids VARCHAR(50) NOT NULL,
+    conventions_profile_bids INTEGER NOT NULL,
+    parameter VARCHAR NOT NULL,
+    expected_min INTEGER NOT NULL,
+    expected_max INTEGER NOT NULL,
+    actual_value INTEGER NOT NULL,
+    gap INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE bidinfo_request (
+    id SERIAL PRIMARY KEY,
+    deal_nb INTEGER NOT NULL,
+    conventions_bids VARCHAR(50) NOT NULL,
+    conventions_profile_bids INTEGER NOT NULL,
+    suit_tolerance INTEGER DEFAULT 0,
+    hcp_tolerance INTEGER DEFAULT 0,
+    bid_index_min VARCHAR DEFAULT -1,
+    bid_index_max VARCHAR DEFAULT -1,
+    status report_generation_status DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO bidinfo_request (deal_nb, conventions_bids, conventions_profile_bids) VALUES
+    (500, '02010000011000101111011111111111111001112111111011', 6);

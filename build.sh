@@ -26,7 +26,7 @@ aws ecr-public get-login-password --region us-east-1 --profile "${AWS_PROFILE}" 
 # Build image
 echo "Deal-report image build started"
 
-docker build -t midgard/deal-report .
+docker build -t midgard/report .
 
 # Exit (SUCCESS)
 exit 0

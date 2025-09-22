@@ -1,19 +1,9 @@
-import { CardList } from 'bridge-commons/core/classes'
-import { BidInfo, Range } from 'bridge-commons/core/types'
-import { REVERSED_SUITS, SUITS } from 'bridge-commons/core/constants'
+import { REVERSED_SUITS } from 'bridge-commons/core/constants'
 
-interface Report {
-  parameter: string
-  expectedRange: Range
-  tolerance: number
-  value: number
-  gap: number
-}
+export function compareBidInfoToPlayerHand(bidInfo, playerCards, suitTolerance, hcpTolerance) {
+  const reports = []
 
-export function compareBidInfoToPlayerHand(bidInfo: BidInfo, playerCards: CardList, suitTolerance: number, hcpTolerance: number): Report[] {
-  const reports: Report[] = []
-
-  // Vérifier le nombre de points d'honneur avec tolérance
+  // Vérifier le nombre de points d'honneur
   const hcpMin = Math.max(0, bidInfo.hcp.min - hcpTolerance)
   const hcpMax = Math.max(0, bidInfo.hcp.max + hcpTolerance)
 
@@ -27,15 +17,15 @@ export function compareBidInfoToPlayerHand(bidInfo: BidInfo, playerCards: CardLi
     })
   }
 
-  // Vérifier le nombre de cartes par couleur avec tolérance
-  const suitNames = ['club', 'diamond', 'heart', 'spade'] as const
+  // Vérifier le nombre de cartes par couleur
+  const suitNames = ['club', 'diamond', 'heart', 'spade']
 
   for (let i = 0; i < REVERSED_SUITS.length; i++) {
     const suitCode = REVERSED_SUITS[i]
     const suitName = suitNames[i]
 
     const playerSuitCount = playerCards.getBySuit(suitCode).length
-    const suitRange = (bidInfo as BidInfo)[suitName]
+    const suitRange = bidInfo[suitName]
 
     const suitMin = Math.max(0, suitRange.min - suitTolerance)
     const suitMax = Math.max(0, suitRange.max + suitTolerance)

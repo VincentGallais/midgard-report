@@ -1,19 +1,29 @@
 import { CommonsServer } from 'midgard-commons/lib/common-server.js'
+import { ReportGeneration } from './endpoints/generation.js'
+import { ReportGenerationRunner } from './src/reportGenerationRunner.js'
 
 const server = new CommonsServer()
 
 await server.initialize()
-await server.registerDefaultEndpoints('/midgard-deal-report')
+await server.registerDefaultEndpoints('/midgard-report')
 await server.setDefaultErrorHandler()
 
-const dealReport = new DealReport(server.fastifyInstance)
+// REPORT GENERATION
+const reportGeneration = new ReportGeneration(server.fastifyInstance)
+
+// REPORT GENERATION RUNNER
+const reportGenerationRunner = new ReportGenerationRunner(server.fastifyInstance)
 
 await server.fastifyInstance.register(
   (fastifyInstance, opts, next) => {
-    dealReport.registerEndpoints(fastifyInstance)
+    reportGeneration.registerEndpoints(fastifyInstance)
     next()
   },
-  { prefix: '/midgard-deal-report' }
+  { prefix: '/midgard-report' }
 )
+
+server.fastifyInstance.ready().then(() => {
+  server.fastifyInstance.scheduler.addSimpleIntervalJob(reportGenerationRunner.createScheduledJob())
+})
 
 await server.startServer()

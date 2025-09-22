@@ -1,24 +1,36 @@
 services:
-  midgard-deal-report:
-    image: midgard/deal-report:latest
-    container_name: midgard-deal-report
+  midgard-report:
+    image: midgard/report:latest
+    container_name: midgard-report
     networks:
       - midgard-network
     restart: always
     ports:
-      - 10002:8080
+      - 10003:8080
     environment:
       - POSTGRES_PRIMARY=midgard-postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PWD=postgres
-      - POSTGRES_DB=midgard-deal-report
+      - POSTGRES_DB=midgard-report
       - ARGINE_URL=http://argine:3000
-    secrets:
-      - GOOGLE_APPLICATION_CREDENTIALS
 
-secrets:
-  GOOGLE_APPLICATION_CREDENTIALS:
-    file: ./gcp_credentials.json
+  midgard-postgres:
+    image: postgres:latest
+    container_name: midgard-postgres
+    networks:
+      - midgard-network
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - midgard-pg-data:/var/lib/postgresql/data
+
+volumes:
+  midgard-pg-data:
+    driver: local
 
 networks:
   midgard-network:

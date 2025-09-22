@@ -1,0 +1,17 @@
+{
+  "$id": "/schemas/types/ConventionType",
+  "additionalProperties": false,
+  "type": "object",
+  "properties": {
+    "bids": {
+      "type": "string",
+      "minLength": 50,
+      "maxLength": 50,
+      "pattern": "^[0-9]*$"
+    },
+    "profileBids": {
+      "type": "number"
+    }
+  },
+  "required": ["bids", "profileBids"]
+}
