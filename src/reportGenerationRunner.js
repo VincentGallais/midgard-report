@@ -8,31 +8,31 @@ import { DEFAULT_CONVENTIONS } from 'bridge-commons/core/constants'
 // SQL Queries
 const ReportGenerationQueries = Object.freeze({
   saveReport: `
-    INSERT INTO public.bidinfo_report (dealer, vulnerability, distribution, bids, conventions_bids, conventions_profile_bids, parameter, expected_min, expected_max, actual_value, gap)
+    INSERT INTO public.report (dealer, vulnerability, distribution, bids, conventions_bids, conventions_profile_bids, parameter, expected_min, expected_max, actual_value, gap)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING *`,
   getRunningReportGenerationCount: `
     SELECT COUNT(*) as count 
-    FROM public.bidinfo_request 
+    FROM public.request 
     WHERE status = 'RUNNING'`,
   getFirstPendingReportGeneration: `
     SELECT id 
-    FROM public.bidinfo_request 
+    FROM public.request 
     WHERE status = 'PENDING' 
     ORDER BY created_at ASC 
     LIMIT 1`,
   getReportGenerationDetails: `
     SELECT deal_nb, conventions_bids, conventions_profile_bids, suit_tolerance, hcp_tolerance, bid_index_min, bid_index_max, status
-    FROM public.bidinfo_request 
+    FROM public.request 
     WHERE id = $1`,
   updateReportGenerationStatus: `
-    UPDATE public.bidinfo_request 
+    UPDATE public.request 
     SET status = $2 
     WHERE id = $1 
     RETURNING *`,
   checkDuplicateReport: `
     SELECT COUNT(*) as count 
-    FROM public.bidinfo_report 
+    FROM public.report 
     WHERE distribution = $1 
     AND bids = $2 
     AND conventions_bids = $3 

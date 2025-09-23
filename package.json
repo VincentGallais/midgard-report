@@ -1,8 +1,8 @@
 {
-  "name": "midgard-report",
+  "name": "midgard-bidinfo",
   "version": "0.0.1",
-  "description": "Argine Deal Report project",
-  "main": "midgard-report.js",
+  "description": "Argine Deal Bid Info project",
+  "main": "midgard-bidinfo.js",
   "type": "module",
   "author": {
     "name": "52 Entertainment"
@@ -42,6 +42,6 @@
     "pino-pretty": "^13.0.0"
   },
   "scripts": {
-    "dev": "tsx --watch src/generateReport.ts"
+    "dev": "tsx --watch src/generateBidInfo.ts"
   }
 }

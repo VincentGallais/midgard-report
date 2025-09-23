@@ -1,7 +1,7 @@
 services:
-  midgard-report:
-    image: midgard/report:latest
-    container_name: midgard-report
+  midgard-bidinfo:
+    image: midgard/bidinfo:latest
+    container_name: midgard-bidinfo
     networks:
       - midgard-network
     restart: always
@@ -11,7 +11,7 @@ services:
       - POSTGRES_PRIMARY=midgard-postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PWD=postgres
-      - POSTGRES_DB=midgard-report
+      - POSTGRES_DB=midgard-bidinfo
       - ARGINE_URL=http://argine:3000
 
   midgard-postgres:

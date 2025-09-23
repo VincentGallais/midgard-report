@@ -24,9 +24,9 @@ echo "Log in to the AWS ECR public repository"
 aws ecr-public get-login-password --region us-east-1 --profile "${AWS_PROFILE}" | docker login --username AWS --password-stdin public.ecr.aws
 
 # Build image
-echo "Deal-report image build started"
+echo "Deal-bidinfo image build started"
 
-docker build -t midgard/report .
+docker build -t midgard/bidinfo .
 
 # Exit (SUCCESS)
 exit 0

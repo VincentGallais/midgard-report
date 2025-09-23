@@ -5,7 +5,7 @@ import { ReportGenerationRunner } from './src/reportGenerationRunner.js'
 const server = new CommonsServer()
 
 await server.initialize()
-await server.registerDefaultEndpoints('/midgard-report')
+await server.registerDefaultEndpoints('/midgard-bidinfo')
 await server.setDefaultErrorHandler()
 
 // REPORT GENERATION

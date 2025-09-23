@@ -7,7 +7,7 @@ import createReportGenerationRequest from '../schemas/requests/CreateReportGener
 // SQL Queries
 const ReportQueries = Object.freeze({
   createReportGeneration: `
-    INSERT INTO public.bidinfo_request (deal_nb, conventions_bids, conventions_profile_bids, suit_tolerance, hcp_tolerance, bid_index_min, bid_index_max)
+    INSERT INTO public.request (deal_nb, conventions_bids, conventions_profile_bids, suit_tolerance, hcp_tolerance, bid_index_min, bid_index_max)
     VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
 })
