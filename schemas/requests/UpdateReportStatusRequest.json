@@ -1,0 +1,12 @@
+{
+  "$id": "/schemas/requests/UpdateReportStatusRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["PENDING", "APPROVED", "REJECTED"]
+    }
+  },
+  "required": ["status"]
+}

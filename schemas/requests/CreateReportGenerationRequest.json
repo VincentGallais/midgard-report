@@ -4,7 +4,8 @@
   "additionalProperties": false,
   "properties": {
     "dealNb": {
-      "type": "number"
+      "type": "number",
+      "minimum": 1
     },
     "conventions": {
       "$ref": "/schemas/types/ConventionType"

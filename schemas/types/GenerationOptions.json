@@ -11,9 +11,13 @@
       "type": "number",
       "minimum": 0
     },
-    "bidIndex": {
+    "bidIndexMin": {
       "type": "number",
-      "minimum": 0
+      "minimum": -1
+    },
+    "bidIndexMax": {
+      "type": "number",
+      "minimum": -1
     }
   },
   "required": []

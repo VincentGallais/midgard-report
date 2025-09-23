@@ -27,8 +27,8 @@ importers:
         specifier: ^1.10.0
         version: 1.12.2
       bridge-commons:
-        specifier: git+https://github.com/52-entertainment/funbridge-commons-js.git#dev
-        version: funbridge-commons-js@git+https://github.com/52-entertainment/funbridge-commons-js.git#2919b2d5f2ef3f8e0babf2abe06d8f4e1dcb966a(vitest@3.2.4(@types/node@24.5.2)(tsx@4.20.5))
+        specifier: git+https://github.com/52-entertainment/funbridge-commons-js.git#e88998885a88c4d02d3d595450bb4870d60d6cbb
+        version: funbridge-commons-js@git+https://github.com/52-entertainment/funbridge-commons-js.git#e88998885a88c4d02d3d595450bb4870d60d6cbb(vitest@3.2.4(@types/node@24.5.2)(tsx@4.20.5))
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1341,8 +1341,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  funbridge-commons-js@git+https://github.com/52-entertainment/funbridge-commons-js.git#2919b2d5f2ef3f8e0babf2abe06d8f4e1dcb966a:
-    resolution: {commit: 2919b2d5f2ef3f8e0babf2abe06d8f4e1dcb966a, repo: https://github.com/52-entertainment/funbridge-commons-js.git, type: git}
+  funbridge-commons-js@git+https://github.com/52-entertainment/funbridge-commons-js.git#e88998885a88c4d02d3d595450bb4870d60d6cbb:
+    resolution: {commit: e88998885a88c4d02d3d595450bb4870d60d6cbb, repo: https://github.com/52-entertainment/funbridge-commons-js.git, type: git}
     version: 1.0.1
     engines: {node: '>=24.0.0', pnpm: '>=10.0.0'}
 
@@ -3807,7 +3807,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  funbridge-commons-js@git+https://github.com/52-entertainment/funbridge-commons-js.git#2919b2d5f2ef3f8e0babf2abe06d8f4e1dcb966a(vitest@3.2.4(@types/node@24.5.2)(tsx@4.20.5)):
+  funbridge-commons-js@git+https://github.com/52-entertainment/funbridge-commons-js.git#e88998885a88c4d02d3d595450bb4870d60d6cbb(vitest@3.2.4(@types/node@24.5.2)(tsx@4.20.5)):
     dependencies:
       '@vitest/coverage-v8': 3.2.4(vitest@3.2.4(@types/node@24.5.2)(tsx@4.20.5))
       axios: 1.12.2

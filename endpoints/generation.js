@@ -9,7 +9,11 @@ const ReportQueries = Object.freeze({
   createReportGeneration: `
     INSERT INTO public.request (deal_nb, conventions_bids, conventions_profile_bids, suit_tolerance, hcp_tolerance, bid_index_min, bid_index_max)
     VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING *`
+    RETURNING *`,
+  getAllGenerationRequests: `
+    SELECT * 
+    FROM public.request 
+    ORDER BY created_at DESC`
 })
 
 export class ReportGeneration {
@@ -28,9 +32,13 @@ export class ReportGeneration {
       data.conventions.profileBids,
       data.options?.suitTolerance,
       data.options?.hcpTolerance,
-      data.options?.bidIndex?.min,
-      data.options?.bidIndex?.max
+      data.options?.bidIndexMin,
+      data.options?.bidIndexMax
     ])
+  }
+
+  async getAllGenerationRequests() {
+    return await this.dbClient.runQuery(ReportQueries.getAllGenerationRequests, [])
   }
 
   // ENDPOINTS
@@ -47,5 +55,8 @@ export class ReportGeneration {
         return { value: 'OK' }
       }
     )
+    fastifyInstance.get('/api/generate', async (request, reply) => {
+      return await this.getAllGenerationRequests()
+    })
   }
 }

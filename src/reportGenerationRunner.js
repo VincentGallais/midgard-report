@@ -51,17 +51,17 @@ export class ReportGenerationRunner {
 
   createScheduledJob() {
     const pendingMatchesTask = new AsyncTask(
-      'Pending Match Scheduled Task',
+      'Pending BidInfo Report Scheduled Task',
       async () => {
         const runningCount = await this.getRunningReportGenerationCount()
         if (runningCount < this.CONCURRENT_REPORT_GENERATION_EXECUTION_NB) {
           const reportGeneration = await this.getFirstPendingReportGeneration()
           if (reportGeneration) {
-            this.logger.info(`Running report generation ${reportGeneration.id}`)
+            this.logger.info(`Running bidInfo report generation ${reportGeneration.id}`)
             try {
               await this.generateReports(reportGeneration.id)
             } catch (err) {
-              this.logger.error(`Error running report generation ${reportGeneration.id}: ${err.message}`)
+              this.logger.error(`Error running bidInfo report generation ${reportGeneration.id}: ${err.message}`)
               await this.updateReportGenerationError(reportGeneration.id)
             }
           }
@@ -71,7 +71,7 @@ export class ReportGenerationRunner {
         this.logger.error(`Error in the scheduled task: ${err.message}`)
       }
     )
-    return new SimpleIntervalJob({ seconds: 5 }, pendingMatchesTask, { preventOverrun: true })
+    return new SimpleIntervalJob({ seconds: 30 }, pendingMatchesTask, { preventOverrun: true })
   }
 
   // CONSTANTS
@@ -89,7 +89,7 @@ export class ReportGenerationRunner {
     ])
 
     if (duplicateCheck[0].count > 0) {
-      this.logger.info(`Rapport ignoré : séquence identique déjà existante pour le même système`)
+      this.logger.info(`BidInfo report skipped: identical sequence already exists for the same conventions system`)
       return null
     }
 
@@ -120,7 +120,7 @@ export class ReportGenerationRunner {
     const result = await this.dbClient.runQuery(ReportGenerationQueries.getReportGenerationDetails, [reportGenerationId])
 
     if (result.length === 0) {
-      throw new Error(`Report generation ${reportGenerationId} not found`)
+      throw new Error(`BidInfo report generation ${reportGenerationId} not found`)
     }
 
     const reportGen = result[0]
@@ -184,12 +184,13 @@ export class ReportGenerationRunner {
 
         const reports = compareBidInfoToPlayerHand(bidInfo, game.distribution.getPlayerHand(bid.player), suitTolerance, hcpTolerance)
         for (const report of reports) {
-          console.log(report)
+          const problematicBidIdx = minIndex + idx
           this.saveReport({
             dealer: game.dealer.name,
             vulnerability: game.vulnerability,
             distribution: game.distribution.toArgineString(),
-            bids: game.bidList.toArgineString(),
+            bids: game.bidList.slice(0, problematicBidIdx + 1).toArgineString(),
+            problematicBidIdx,
             conventionsBids: conventions.bids,
             conventionsProfileBids: conventions.profileBids,
             parameter: report.parameter,
@@ -204,6 +205,6 @@ export class ReportGenerationRunner {
       }
     }
     await this.updateReportGenerationStatus(reportGenerationId, 'COMPLETED')
-    this.logger.info(`Report generation ${reportGenerationId} completed successfully`)
+    this.logger.info(`BidInfo report generation ${reportGenerationId} completed successfully`)
   }
 }
