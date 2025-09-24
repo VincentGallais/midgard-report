@@ -1,6 +1,6 @@
 import pino from 'pino'
 import { AsyncTask, SimpleIntervalJob } from 'toad-scheduler'
-import { ArgineInterface, BidList, Game } from 'bridge-commons/core/classes'
+import { ArgineInterface, Bid, Game } from 'bridge-commons/core/classes'
 import { PostgresClient } from 'midgard-commons/lib/postgres-client.js'
 import { compareBidInfoToPlayerHand } from './utils.js'
 import { DEFAULT_CONVENTIONS } from 'bridge-commons/core/constants'
@@ -79,33 +79,44 @@ export class ReportGenerationRunner {
 
   // POSTGRESQL FUNCTIONS
   async saveReport(data) {
-    // Vérifier si une séquence identique pour le même système existe déjà
-    const duplicateCheck = await this.dbClient.runQuery(ReportGenerationQueries.checkDuplicateReport, [
-      data.distribution,
-      data.bids,
-      data.conventionsBids,
-      data.conventionsProfileBids,
-      data.parameter
-    ])
-
-    if (duplicateCheck[0].count > 0) {
-      this.logger.info(`BidInfo report skipped: identical sequence already exists for the same conventions system`)
+    // Valider les données avant la sauvegarde
+    if (!data || !data.distribution || !data.bids || !data.parameter) {
+      this.logger.warn('Invalid report data, skipping save:', data)
       return null
     }
 
-    return await this.dbClient.runQuery(ReportGenerationQueries.saveReport, [
-      data.dealer,
-      data.vulnerability,
-      data.distribution,
-      data.bids,
-      data.conventionsBids,
-      data.conventionsProfileBids,
-      data.parameter,
-      data.expectedMin,
-      data.expectedMax,
-      data.actualValue,
-      data.gap
-    ])
+    try {
+      // Vérifier si une séquence identique pour le même système existe déjà
+      const duplicateCheck = await this.dbClient.runQuery(ReportGenerationQueries.checkDuplicateReport, [
+        data.distribution,
+        data.bids,
+        data.conventionsBids,
+        data.conventionsProfileBids,
+        data.parameter
+      ])
+
+      if (duplicateCheck[0].count > 0) {
+        this.logger.info(`BidInfo report skipped: identical sequence already exists for the same conventions system`)
+        return null
+      }
+
+      return await this.dbClient.runQuery(ReportGenerationQueries.saveReport, [
+        data.dealer,
+        data.vulnerability,
+        data.distribution,
+        data.bids,
+        data.conventionsBids,
+        data.conventionsProfileBids,
+        data.parameter,
+        data.expectedMin,
+        data.expectedMax,
+        data.actualValue,
+        data.gap
+      ])
+    } catch (error) {
+      this.logger.error(`Error saving report: ${error.message}`, { data })
+      throw error
+    }
   }
 
   async getRunningReportGenerationCount() {
@@ -154,54 +165,54 @@ export class ReportGenerationRunner {
 
   async generateReports(reportGenerationId) {
     const { dealNb, conventions, options } = await this.getReportGenerationDetails(reportGenerationId)
-    const { suitTolerance = 0, hcpTolerance = 0, bidIndex = { min: -1, max: -1 } } = options || {}
-
     for (let i = 0; i < dealNb; i++) {
-      const game = Game.random()
+      try {
+        const game = Game.random()
+        game.setCustomParams({
+          nsConventions: conventions,
+          ewConventions: conventions
+        })
 
-      game.setCustomParams({
-        nsConventions: conventions,
-        ewConventions: conventions
-      })
+        // On demande des enchères tant qu'on se situe avant maxIndex (ou jusqu'à la fin des enchères si maxIndex vaut -1)
+        while ((game.bidList.length < options.bidIndex.max || options.bidIndex.max === -1) && !game.isBiddingFinished) {
+          const nextBidWithInfo = await this.argineInterface.getBidWithInfo(game.toArgine())
+          const nextBid = Bid.fromName(nextBidWithInfo.bid)
 
-      await this.argineInterface.runGame(game, { bidsOnly: true })
-
-      // On analyse les enchères comprises entre l'index min et max
-      const minIndex = bidIndex.min < 0 ? 0 : Math.min(bidIndex.min, game.bidList.length)
-      const maxIndex = bidIndex.max < 0 ? game.bidList.length : Math.min(bidIndex.max, game.bidList.length)
-
-      const bidsToAnalyze = BidList.fromBidsList(game.bidList.list.slice(minIndex, maxIndex))
-
-      if (bidsToAnalyze.length === 0) continue
-
-      const query = game.toArgine()
-      query.game.bids = query.game.bids.slice(0, minIndex * 2)
-
-      for (const [idx, bid] of bidsToAnalyze.entries()) {
-        query.game.bids += bid.name
-
-        const bidInfo = await this.argineInterface.getBidInfo(query)
-
-        const reports = compareBidInfoToPlayerHand(bidInfo, game.distribution.getPlayerHand(bid.player), suitTolerance, hcpTolerance)
-        for (const report of reports) {
-          const problematicBidIdx = minIndex + idx
-          this.saveReport({
-            dealer: game.dealer.name,
-            vulnerability: game.vulnerability,
-            distribution: game.distribution.toArgineString(),
-            bids: game.bidList.slice(0, problematicBidIdx + 1).toArgineString(),
-            problematicBidIdx,
-            conventionsBids: conventions.bids,
-            conventionsProfileBids: conventions.profileBids,
-            parameter: report.parameter,
-            expectedMin: report.expectedRange.min,
-            expectedMax: report.expectedRange.max,
-            actualValue: report.value,
-            gap: report.gap
-          })
+          // On analyse que dans la plage demandée
+          if (game.bidList.length > options.bidIndex.min || options.bidIndex.min === -1) {
+            const reports = compareBidInfoToPlayerHand(
+              nextBidWithInfo.bidInfo,
+              game.distribution.getPlayerHand(game.currentPlayer),
+              options.suitTolerance,
+              options.hcpTolerance
+            )
+            for (const report of reports) {
+              await this.saveReport({
+                dealer: game.dealer.name,
+                vulnerability: game.vulnerability,
+                distribution: game.distribution.toArgineString(),
+                bids: game.bidList.toArgineString() + nextBid.name,
+                problematicBidIdx: game.bidList.length + 1,
+                conventionsBids: conventions.bids,
+                conventionsProfileBids: conventions.profileBids,
+                parameter: report.parameter,
+                expectedMin: report.expectedRange.min,
+                expectedMax: report.expectedRange.max,
+                actualValue: report.value,
+                gap: report.gap
+              })
+            }
+            // On arrête l'analyse si on a trouvé une erreur car les enchères suivantes seront tout autant impactées
+            if (reports.length > 0) {
+              console.log(`Report generated for deal ${game.distribution.toArgineString()}.`)
+              break
+            }
+          }
+          game.addBid(nextBid)
         }
-        // On arrête l'analyse si on a trouvé une erreur car les enchères suivantes sont tout autant impactées
-        break
+      } catch (dealError) {
+        this.logger.error(`Error processing deal ${i + 1}: ${dealError.message}`)
+        continue
       }
     }
     await this.updateReportGenerationStatus(reportGenerationId, 'COMPLETED')

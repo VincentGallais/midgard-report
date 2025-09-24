@@ -30,10 +30,10 @@ export class ReportGeneration {
       data.dealNb,
       data.conventions.bids,
       data.conventions.profileBids,
-      data.options?.suitTolerance,
-      data.options?.hcpTolerance,
-      data.options?.bidIndexMin,
-      data.options?.bidIndexMax
+      data.options?.suitTolerance || 0,
+      data.options?.hcpTolerance || 0,
+      data.options?.bidIndexMin || -1,
+      data.options?.bidIndexMax || -1
     ])
   }
 

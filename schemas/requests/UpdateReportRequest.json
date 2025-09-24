@@ -1,0 +1,22 @@
+{
+  "$id": "/schemas/requests/UpdateReportRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["PENDING", "PROCESSED", "CLOSED"]
+    },
+    "newExpectedMin": {
+      "type": "integer"
+    },
+    "newExpectedMax": {
+      "type": "integer"
+    },
+    "alternativeBid": {
+      "type": "string",
+      "pattern": "^[1-7][CDHS]$"
+    }
+  },
+  "required": [""]
+}

@@ -4,16 +4,14 @@ export function compareBidInfoToPlayerHand(bidInfo, playerCards, suitTolerance, 
   const reports = []
 
   // Vérifier le nombre de points d'honneur
-  const hcpMin = Math.max(0, bidInfo.hcp.min - hcpTolerance)
-  const hcpMax = Math.max(0, bidInfo.hcp.max + hcpTolerance)
-
-  if (playerCards.hcp < hcpMin || playerCards.hcp > hcpMax) {
+  const gap = playerCards.hcp < bidInfo.hcp.min ? bidInfo.hcp.min - playerCards.hcp : playerCards.hcp - bidInfo.hcp.max
+  if (gap > hcpTolerance) {
     reports.push({
       parameter: 'hcp',
       expectedRange: { min: bidInfo.hcp.min, max: bidInfo.hcp.max },
       tolerance: hcpTolerance,
       value: playerCards.hcp,
-      gap: Math.min(Math.abs(playerCards.hcp - hcpMin), Math.abs(playerCards.hcp - hcpMax))
+      gap
     })
   }
 
@@ -27,16 +25,14 @@ export function compareBidInfoToPlayerHand(bidInfo, playerCards, suitTolerance, 
     const playerSuitCount = playerCards.getBySuit(suitCode).length
     const suitRange = bidInfo[suitName]
 
-    const suitMin = Math.max(0, suitRange.min - suitTolerance)
-    const suitMax = Math.max(0, suitRange.max + suitTolerance)
-
-    if (playerSuitCount < suitMin || playerSuitCount > suitMax) {
+    const gap = playerSuitCount < suitRange.min ? suitRange.min - playerSuitCount : playerSuitCount - suitRange.max
+    if (gap > suitTolerance) {
       reports.push({
         parameter: suitName,
         expectedRange: { min: suitRange.min, max: suitRange.max },
         tolerance: suitTolerance,
         value: playerSuitCount,
-        gap: Math.min(Math.abs(playerSuitCount - suitMin), Math.abs(playerSuitCount - suitMax))
+        gap
       })
     }
   }

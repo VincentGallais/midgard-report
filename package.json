@@ -33,7 +33,7 @@
     "@fastify/postgres": "^6.0.2",
     "@fastify/schedule": "^6.0.0",
     "axios": "^1.10.0",
-    "bridge-commons": "git+https://github.com/52-entertainment/funbridge-commons-js.git#e88998885a88c4d02d3d595450bb4870d60d6cbb",
+    "bridge-commons": "git+https://github.com/52-entertainment/funbridge-commons-js.git#9a1e282a72a52c97bfd0ed2820cbed1f7d3bf506",
     "midgard-commons": "github:52-entertainment/midgard-commons#master",
     "date-fns": "^4.1.0",
     "fastify": "^5.4.0",
