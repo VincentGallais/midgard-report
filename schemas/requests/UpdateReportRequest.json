@@ -15,7 +15,7 @@
     },
     "alternativeBid": {
       "type": "string",
-      "pattern": "^[1-7][CDHS]$"
+      "pattern": "^(PA|X1|X2|[1-7][CDHSN])$"
     }
   },
   "required": [""]
